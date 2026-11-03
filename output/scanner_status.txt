@@ -1,0 +1,11 @@
+last_scanner_run=2026-11-03T15:46:52+06:00
+rows_all=418
+rows_top30=30
+latest_quote=2026-11-03T15:44:14+06:00
+market_regime=CAUTION
+market_stress=61.34334336971064
+buy_candidates=2
+top_symbol=MPETROLEUM
+top_action=BUY - BREAKOUT CONFIRMED
+top_score=75.0
+engine=V4 | gates=Trend+RSI50-70+MACD+Volume+Fib/EMA location+Extension<=10%+R:R>=2 | score=supporting 0-100
