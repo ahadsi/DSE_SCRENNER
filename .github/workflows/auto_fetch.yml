@@ -1,0 +1,56 @@
+name: DSE Auto Data Collector
+
+on:
+  schedule:
+    - cron: '*/30 4-9 * * 1-5' # Prottek 30 min por por trading hour-e run korbe
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Dependencies
+        run: pip install -r DSE_Smart_Scanner_Phase1_Live/requirements.txt
+        
+      - name: Run Collector Script
+        run: |
+          cd DSE_Smart_Scanner_Phase1_Live
+          python dse_collector.py
+          
+      - name: Commit and Push New Data
+        run: |
+          git config --global user.name 'DSE Bot'
+          git config --global user.email 'bot@local'
+          git add DSE_Smart_Scanner_Phase1_Live/data/ DSE_Smart_Scanner_Phase1_Live/reference_data/ *.db || true
+          git commit -m "Auto-update latest market data [skip ci]" || exit 0
+          git push
+```[cite: 3]
+
+---
+
+### Step 2: `dashboard.py`-te Force Refresh & TTL Add Korun
+Cloud-e jate purono data cache kore na rakhe, tar jonno `dashboard.py` file-er data loading function-gulo te `ttl=0` ba short time set kore din, ebong sidebar-e ekta refresh button add korun[cite: 3]:
+
+1. Apnar `dashboard.py` file-ti open korun[cite: 3].
+2. Database ba CSV load korar function-gulo te cache control add korun:
+   ```python
+   @st.cache_data(ttl=10) # Prottek 10 second por por notun data read korbe
+   def load_latest_market_data():
+       # Apnar data query ba read korar code ekhane thakbe
+       pass
+   ```[cite: 3]
+3. Sidebar ba main screen-e ekta manual refresh button diye din:
+   ```python
+   if st.sidebar.button("🔄 Reload Live Data"):
+       st.cache_data.clear()
+       st.rerun()
+   ```[cite: 3]
+
+Ei duita jinish add kore GitHub-e abar push (`git add .`, `git commit`, `git push`) kore dile Streamlit Cloud-er purono data dekhanor shomoshsha r thakbe na, ebong automatic updated data load hobe[cite: 3]!
